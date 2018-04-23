@@ -79,7 +79,6 @@ public class HelloArActivity extends AppCompatActivity implements GLSurfaceView.
 
     private final BackgroundRenderer backgroundRenderer = new BackgroundRenderer();
     private final ObjectRenderer virtualObject = new ObjectRenderer();
-    private final ObjectRenderer virtualObjectShadow = new ObjectRenderer();
     private final PlaneRenderer planeRenderer = new PlaneRenderer();
     private final PointCloudRenderer pointCloudRenderer = new PointCloudRenderer();
 
@@ -225,11 +224,6 @@ public class HelloArActivity extends AppCompatActivity implements GLSurfaceView.
             virtualObject.createOnGlThread(/*context=*/ this, "models/CapuchinMonkey.obj", "models/CapuchinMonkey_BaseColor.png");
             virtualObject.setMaterialProperties(0.0f, 2.0f, 0.5f, 6.0f);
 
-            virtualObjectShadow.createOnGlThread(
-          /*context=*/ this, "models/andy_shadow.obj", "models/andy_shadow.png");
-            virtualObjectShadow.setBlendMode(BlendMode.Shadow);
-            virtualObjectShadow.setMaterialProperties(1.0f, 0.0f, 0.0f, 1.0f);
-
         } catch (IOException e) {
             Log.e(TAG, "Failed to read an asset file", e);
         }
@@ -350,9 +344,7 @@ public class HelloArActivity extends AppCompatActivity implements GLSurfaceView.
 
                 // Update and draw the model and its shadow.
                 virtualObject.updateModelMatrix(anchorMatrix, scaleFactor);
-                virtualObjectShadow.updateModelMatrix(anchorMatrix, scaleFactor);
                 virtualObject.draw(viewmtx, projmtx, colorCorrectionRgba);
-                virtualObjectShadow.draw(viewmtx, projmtx, colorCorrectionRgba);
             }
 
         } catch (Throwable t) {
