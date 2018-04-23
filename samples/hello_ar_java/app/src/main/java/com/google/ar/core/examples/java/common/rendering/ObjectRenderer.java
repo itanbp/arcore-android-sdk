@@ -261,14 +261,9 @@ public class ObjectRenderer {
         Matrix.multiplyMM(this.modelMatrix, 0, modelMatrix, 0, scaleMatrix, 0);
 
 
-        float[] scaleAgainMatrix = new float[16];
-        Matrix.setIdentityM(scaleAgainMatrix, 0);
-        scaleAgainMatrix[0] = 3;
-        scaleAgainMatrix[5] = 3;
-        scaleAgainMatrix[10] = 3;
-        Matrix.multiplyMM(this.modelMatrix, 0, this.modelMatrix, 0, scaleAgainMatrix, 0);
-
-        //Matrix.setRotateM(this.modelMatrix, 0, angleDegrees, 0, 1, 0);
+        float[] rotateMatrix = new float[16];
+        Matrix.setRotateM(rotateMatrix, 0, 90, 0, 1, 0);
+        Matrix.multiplyMM(this.modelMatrix, 0, this.modelMatrix, 0, rotateMatrix, 0);
 
     }
 
