@@ -84,6 +84,7 @@ public class HelloArActivity extends AppCompatActivity implements GLSurfaceView.
 
     // Temporary matrix allocated here to reduce number of allocations for each frame.
     private final float[] anchorMatrix = new float[16];
+    private final float[] rotationMatrix = new float[16];
 
     // Anchors created from taps used for object placing.
     private final ArrayList<Anchor> anchors = new ArrayList<>();
@@ -333,7 +334,8 @@ public class HelloArActivity extends AppCompatActivity implements GLSurfaceView.
 
             // Visualize anchors created by touch.
             //float scaleFactor = 1.0f;
-            float scaleFactor = 0.015f; // capuchin
+            float scaleFactor = 0.15f; // capuchin
+
             for (Anchor anchor : anchors) {
                 if (anchor.getTrackingState() != TrackingState.TRACKING) {
                     continue;
@@ -342,8 +344,10 @@ public class HelloArActivity extends AppCompatActivity implements GLSurfaceView.
                 // during calls to session.update() as ARCore refines its estimate of the world.
                 anchor.getPose().toMatrix(anchorMatrix, 0);
 
+                camera.getPose().extractRotation().toMatrix(rotationMatrix, 0);
+
                 // Update and draw the model and its shadow.
-                virtualObject.updateModelMatrix(anchorMatrix, scaleFactor);
+                virtualObject.updateModelMatrix(anchorMatrix, scaleFactor, rotationMatrix);
                 virtualObject.draw(viewmtx, projmtx, colorCorrectionRgba);
             }
 
