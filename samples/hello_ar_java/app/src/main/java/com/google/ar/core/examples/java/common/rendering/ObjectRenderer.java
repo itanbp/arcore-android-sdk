@@ -252,12 +252,24 @@ public class ObjectRenderer {
      * @see android.opengl.Matrix
      */
     public void updateModelMatrix(float[] modelMatrix, float scaleFactor) {
+
         float[] scaleMatrix = new float[16];
         Matrix.setIdentityM(scaleMatrix, 0);
         scaleMatrix[0] = scaleFactor;
         scaleMatrix[5] = scaleFactor;
         scaleMatrix[10] = scaleFactor;
         Matrix.multiplyMM(this.modelMatrix, 0, modelMatrix, 0, scaleMatrix, 0);
+
+
+        float[] scaleAgainMatrix = new float[16];
+        Matrix.setIdentityM(scaleAgainMatrix, 0);
+        scaleAgainMatrix[0] = 3;
+        scaleAgainMatrix[5] = 3;
+        scaleAgainMatrix[10] = 3;
+        Matrix.multiplyMM(this.modelMatrix, 0, this.modelMatrix, 0, scaleAgainMatrix, 0);
+
+        //Matrix.setRotateM(this.modelMatrix, 0, angleDegrees, 0, 1, 0);
+
     }
 
     /**
