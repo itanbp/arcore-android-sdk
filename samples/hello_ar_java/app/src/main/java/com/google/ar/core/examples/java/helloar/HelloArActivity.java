@@ -90,7 +90,6 @@ public class HelloArActivity extends AppCompatActivity implements GLSurfaceView.
     // Temporary matrix allocated here to reduce number of allocations for each frame.
     private final float[] anchorMatrix = new float[16];
     //private final float[] rotationMatrix = new float[16];
-    // test
 
     // Anchors created from taps used for object placing.
     private final ArrayList<Anchor> anchors = new ArrayList<>();
