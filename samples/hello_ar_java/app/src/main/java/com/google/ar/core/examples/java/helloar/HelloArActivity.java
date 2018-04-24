@@ -33,12 +33,14 @@ import com.google.ar.core.Plane;
 import com.google.ar.core.Point;
 import com.google.ar.core.Point.OrientationMode;
 import com.google.ar.core.PointCloud;
+import com.google.ar.core.Pose;
 import com.google.ar.core.Session;
 import com.google.ar.core.Trackable;
 import com.google.ar.core.TrackingState;
 import com.google.ar.core.examples.java.common.helpers.CameraPermissionHelper;
 import com.google.ar.core.examples.java.common.helpers.DisplayRotationHelper;
 import com.google.ar.core.examples.java.common.helpers.FullScreenHelper;
+import com.google.ar.core.examples.java.common.helpers.MathHelper;
 import com.google.ar.core.examples.java.common.helpers.SnackbarHelper;
 import com.google.ar.core.examples.java.common.helpers.TapHelper;
 import com.google.ar.core.examples.java.common.rendering.BackgroundRenderer;
@@ -65,6 +67,9 @@ import javax.microedition.khronos.opengles.GL10;
  * plane to place a 3d model of the Android robot.
  */
 public class HelloArActivity extends AppCompatActivity implements GLSurfaceView.Renderer {
+
+    private static final float[] OBJECT_NATIVE_FACING = new float[]{0, 0, 1}; // direction object faces in model
+
     private static final String TAG = HelloArActivity.class.getSimpleName();
 
     // Rendering. The Renderers are created here, and initialized when the GL surface is created.
@@ -84,7 +89,7 @@ public class HelloArActivity extends AppCompatActivity implements GLSurfaceView.
 
     // Temporary matrix allocated here to reduce number of allocations for each frame.
     private final float[] anchorMatrix = new float[16];
-    private final float[] rotationMatrix = new float[16];
+    //private final float[] rotationMatrix = new float[16];
 
     // Anchors created from taps used for object placing.
     private final ArrayList<Anchor> anchors = new ArrayList<>();
@@ -340,14 +345,25 @@ public class HelloArActivity extends AppCompatActivity implements GLSurfaceView.
                 if (anchor.getTrackingState() != TrackingState.TRACKING) {
                     continue;
                 }
+
+
+                /*
+                code taken from
+                https://github.com/google-ar/arcore-android-sdk/issues/326#issuecomment-383676563
+                 */
+                float[] objectToCamera = MathHelper.getPoseTranslation(anchor.getPose().extractTranslation().inverse().compose(camera.getPose()));
+                objectToCamera[1] = 0; // only consider x/z component of displacement
+                Pose cameraFacingPose = anchor.getPose().extractTranslation().compose(MathHelper.rotateBetween(OBJECT_NATIVE_FACING, objectToCamera));
+
+                //camera.getPose().extractRotation().toMatrix(rotationMatrix, 0);
+
                 // Get the current pose of an Anchor in world space. The Anchor pose is updated
                 // during calls to session.update() as ARCore refines its estimate of the world.
-                anchor.getPose().toMatrix(anchorMatrix, 0);
+                cameraFacingPose.toMatrix(anchorMatrix, 0);
 
-                camera.getPose().extractRotation().toMatrix(rotationMatrix, 0);
 
                 // Update and draw the model and its shadow.
-                virtualObject.updateModelMatrix(anchorMatrix, scaleFactor, rotationMatrix);
+                virtualObject.updateModelMatrix(anchorMatrix, scaleFactor);
                 virtualObject.draw(viewmtx, projmtx, colorCorrectionRgba);
             }
 
