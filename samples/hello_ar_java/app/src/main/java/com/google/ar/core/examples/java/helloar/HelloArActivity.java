@@ -347,21 +347,17 @@ public class HelloArActivity extends AppCompatActivity implements GLSurfaceView.
                     continue;
                 }
 
-
                 /*
-                code taken from
-                https://github.com/google-ar/arcore-android-sdk/issues/326#issuecomment-383676563
+                taken from
+                https://stackoverflow.com/a/47358710/1869297
                  */
-                float[] objectToCamera = MathHelper.getPoseTranslation(anchor.getPose().extractTranslation().inverse().compose(camera.getPose()));
-                objectToCamera[1] = 0; // only consider x/z component of displacement
-                Pose cameraFacingPose = anchor.getPose().extractTranslation().compose(MathHelper.rotateBetween(OBJECT_NATIVE_FACING, objectToCamera));
+                float translation[] = new float[3];
+                float rotation[] = new float[4];
+                anchor.getPose().getTranslation(translation,0);
+                frame.getCamera().getDisplayOrientedPose().getRotationQuaternion(rotation,0);
 
-                //camera.getPose().extractRotation().toMatrix(rotationMatrix, 0);
-
-                // Get the current pose of an Anchor in world space. The Anchor pose is updated
-                // during calls to session.update() as ARCore refines its estimate of the world.
-                cameraFacingPose.toMatrix(anchorMatrix, 0);
-
+                Pose rotatedPose = new Pose(translation,rotation);
+                rotatedPose.toMatrix(anchorMatrix,0);
 
                 // Update and draw the model and its shadow.
                 virtualObject.updateModelMatrix(anchorMatrix, scaleFactor);
