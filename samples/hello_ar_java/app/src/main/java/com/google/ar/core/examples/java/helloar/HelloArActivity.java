@@ -16,6 +16,8 @@
 
 package com.google.ar.core.examples.java.helloar;
 
+import android.graphics.ImageFormat;
+import android.media.Image;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
@@ -49,6 +51,7 @@ import com.google.ar.core.examples.java.common.rendering.ObjectRenderer.BlendMod
 import com.google.ar.core.examples.java.common.rendering.PlaneRenderer;
 import com.google.ar.core.examples.java.common.rendering.PointCloudRenderer;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
+import com.google.ar.core.exceptions.NotYetAvailableException;
 import com.google.ar.core.exceptions.UnavailableApkTooOldException;
 import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException;
 import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException;
@@ -363,6 +366,15 @@ public class HelloArActivity extends AppCompatActivity implements GLSurfaceView.
                 virtualObject.updateModelMatrix(anchorMatrix, scaleFactor);
                 virtualObject.draw(viewmtx, projmtx, colorCorrectionRgba);
             }
+
+            /*
+            try (final Image image = frame.acquireCameraImage()) {
+                if (image.getFormat() == ImageFormat.YUV_420_888) {
+                    image.close();
+                }
+            } catch (NotYetAvailableException e) {
+            }
+            */
 
         } catch (Throwable t) {
             // Avoid crashing the application due to unhandled exceptions.
