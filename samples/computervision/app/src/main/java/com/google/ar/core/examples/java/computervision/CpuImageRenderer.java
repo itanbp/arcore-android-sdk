@@ -197,7 +197,14 @@ public class CpuImageRenderer {
       int imageHeight,
       ByteBuffer processedImageBytesGrayscale,
       float screenAspectRatio,
-      int cameraToDisplayRotation) {
+      int cameraToDisplayRotation, int imageFormat) {
+
+    int glFormat;
+    if (imageFormat != -1 && imageFormat == TextureReaderImage.IMAGE_FORMAT_RGBA) {
+      glFormat = GLES20.GL_RGBA;
+    } else { // IMAGE_FORMAT_I8 or CPU_DIRECT_ACCESS
+      glFormat = GLES20.GL_LUMINANCE;
+    }
 
     // Apply overlay image buffer
     if (processedImageBytesGrayscale != null) {
@@ -206,11 +213,11 @@ public class CpuImageRenderer {
       GLES20.glTexImage2D(
           GLES20.GL_TEXTURE_2D,
           0,
-          GLES20.GL_RGBA,
+              glFormat,
           imageWidth,
           imageHeight,
           0,
-          GLES20.GL_RGBA,
+              glFormat,
           GLES20.GL_UNSIGNED_BYTE,
           processedImageBytesGrayscale);
     }

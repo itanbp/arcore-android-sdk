@@ -88,6 +88,8 @@ public class ComputerVisionActivity extends AppCompatActivity implements GLSurfa
     private static final int IMAGE_WIDTH = 1280;
     private static final int IMAGE_HEIGHT = 720;
 
+    private boolean saveFlag = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -283,7 +285,7 @@ public class ComputerVisionActivity extends AppCompatActivity implements GLSurfa
                     image.getHeight(),
                     processedImageBytesGrayscale,
                     cpuImageDisplayRotationHelper.getViewportAspectRatio(),
-                    cpuImageDisplayRotationHelper.getCameraToDisplayRotation());
+                    cpuImageDisplayRotationHelper.getCameraToDisplayRotation(), -1);
 
         } catch (NotYetAvailableException e) {
             // This exception will routinely happen during startup, and is expected. cpuImageRenderer
@@ -307,9 +309,14 @@ public class ComputerVisionActivity extends AppCompatActivity implements GLSurfa
                     edgeDetector.detect(image.width, image.height, /* stride= */ image.width, image.buffer);
 
 
-            Bitmap bitmap = Bitmap.createBitmap(IMAGE_WIDTH, IMAGE_HEIGHT, Bitmap.Config.ARGB_8888);
-            bitmap.copyPixelsFromBuffer(image.buffer.position(0));
-            ImageUtils.saveBitmap(bitmap);
+            if (!saveFlag) {
+                Bitmap bitmap = Bitmap.createBitmap(IMAGE_WIDTH, IMAGE_HEIGHT, Bitmap.Config.ARGB_8888);
+                bitmap.copyPixelsFromBuffer(image.buffer.position(0));
+                ImageUtils.saveBitmap(bitmap);
+
+                saveFlag = true;
+            }
+
 
 
             // You should always release frame buffer after using. Otherwise the next call to
@@ -322,7 +329,8 @@ public class ComputerVisionActivity extends AppCompatActivity implements GLSurfa
                     IMAGE_HEIGHT,
                     processedImageBytesGrayscale,
                     cpuImageDisplayRotationHelper.getViewportAspectRatio(),
-                    cpuImageDisplayRotationHelper.getCameraToDisplayRotation());
+                    cpuImageDisplayRotationHelper.getCameraToDisplayRotation(),
+                    image.format);
 
 
         } else {
