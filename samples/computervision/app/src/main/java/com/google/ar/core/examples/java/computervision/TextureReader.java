@@ -219,7 +219,7 @@ public class TextureReader {
             GLES20.GL_FRAGMENT_SHADER,
             imageFormat == TextureReaderImage.IMAGE_FORMAT_I8
                 ? "shaders/gpu_download_i8.frag"
-                : "shaders/gpu_download_rgba.frag");
+                : "shaders/gpu_download_rgba.frag"); // this is the relevant fragment shader for creating Bitmap from IMAGE_FORMAT_RGBA and GPU_DOWNLOAD
 
     quadProgram = GLES20.glCreateProgram();
     GLES20.glAttachShader(quadProgram, vertexShader);

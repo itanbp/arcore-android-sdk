@@ -88,8 +88,6 @@ public class ComputerVisionActivity extends AppCompatActivity implements GLSurfa
     private static final int IMAGE_WIDTH = 1280;
     private static final int IMAGE_HEIGHT = 720;
 
-    private boolean saveFlag = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -309,13 +307,10 @@ public class ComputerVisionActivity extends AppCompatActivity implements GLSurfa
                     edgeDetector.detect(image.width, image.height, /* stride= */ image.width, image.buffer);
 
 
-            if (!saveFlag) {
-                Bitmap bitmap = Bitmap.createBitmap(IMAGE_WIDTH, IMAGE_HEIGHT, Bitmap.Config.ARGB_8888);
-                bitmap.copyPixelsFromBuffer(image.buffer.position(0));
-                ImageUtils.saveBitmap(bitmap);
 
-                saveFlag = true;
-            }
+            Bitmap bitmap = Bitmap.createBitmap(IMAGE_WIDTH, IMAGE_HEIGHT, Bitmap.Config.ARGB_8888);
+            bitmap.copyPixelsFromBuffer(image.buffer.position(0));
+            ImageUtils.saveBitmap(bitmap);
 
 
 
