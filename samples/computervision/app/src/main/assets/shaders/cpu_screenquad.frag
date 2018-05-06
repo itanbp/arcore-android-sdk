@@ -24,7 +24,8 @@ uniform sampler2D TexCpuImageGrayscale;
 void main() {
   if (v_TexCoord.x < s_SplitterPosition)
   {
-    gl_FragColor = texture2D(TexVideo, v_TexCoord);
+    gl_FragColor = texture2D(TexVideo, v_TexCoord).rgba;
+    //gl_FragColor = texture2D(TexVideo, v_TexCoord);
   }
   else
   {

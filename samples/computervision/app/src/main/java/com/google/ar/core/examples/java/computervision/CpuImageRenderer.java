@@ -206,11 +206,11 @@ public class CpuImageRenderer {
       GLES20.glTexImage2D(
           GLES20.GL_TEXTURE_2D,
           0,
-          GLES20.GL_LUMINANCE,
+          GLES20.GL_RGBA,
           imageWidth,
           imageHeight,
           0,
-          GLES20.GL_LUMINANCE,
+          GLES20.GL_RGBA,
           GLES20.GL_UNSIGNED_BYTE,
           processedImageBytesGrayscale);
     }
