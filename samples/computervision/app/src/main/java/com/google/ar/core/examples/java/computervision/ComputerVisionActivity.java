@@ -307,6 +307,7 @@ public class ComputerVisionActivity extends AppCompatActivity implements GLSurfa
                     edgeDetector.detect(image.width, image.height, /* stride= */ image.width, image.buffer);
 
 
+            // TODO notice no conversion between IMAGE_FORMAT_RGBA (image.buffer) to ARGB_8888 (bitmap)
             /*
             Bitmap bitmap = Bitmap.createBitmap(IMAGE_WIDTH, IMAGE_HEIGHT, Bitmap.Config.ARGB_8888);
             bitmap.copyPixelsFromBuffer(image.buffer.position(0));
