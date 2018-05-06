@@ -306,6 +306,12 @@ public class ComputerVisionActivity extends AppCompatActivity implements GLSurfa
             ByteBuffer processedImageBytesGrayscale =
                     edgeDetector.detect(image.width, image.height, /* stride= */ image.width, image.buffer);
 
+
+            Bitmap bitmap = Bitmap.createBitmap(IMAGE_WIDTH, IMAGE_HEIGHT, Bitmap.Config.ARGB_8888);
+            bitmap.copyPixelsFromBuffer(image.buffer.position(0));
+            ImageUtils.saveBitmap(bitmap);
+
+
             // You should always release frame buffer after using. Otherwise the next call to
             // submitFrame() may fail.
             textureReader.releaseFrame(gpuDownloadFrameBufferIndex);
@@ -317,6 +323,7 @@ public class ComputerVisionActivity extends AppCompatActivity implements GLSurfa
                     processedImageBytesGrayscale,
                     cpuImageDisplayRotationHelper.getViewportAspectRatio(),
                     cpuImageDisplayRotationHelper.getCameraToDisplayRotation());
+
 
         } else {
             cpuImageRenderer.drawWithoutCpuImage();
