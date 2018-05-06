@@ -56,7 +56,7 @@ public class ComputerVisionActivity extends AppCompatActivity implements GLSurfa
   };
 
   // Select the image acquisition path here.
-  private final ImageAcquisitionPath imageAcquisitionPath = ImageAcquisitionPath.CPU_DIRECT_ACCESS;
+  private final ImageAcquisitionPath imageAcquisitionPath = ImageAcquisitionPath.GPU_DOWNLOAD;
 
   // Session management and rendering.
   private GLSurfaceView surfaceView;
@@ -207,7 +207,7 @@ public class ComputerVisionActivity extends AppCompatActivity implements GLSurfa
       // Set keepAspectRatio to false so that the output image covers the whole viewport.
       textureReader.create(
           /* context= */ this,
-          TextureReaderImage.IMAGE_FORMAT_I8,
+          TextureReaderImage.IMAGE_FORMAT_RGBA,
           IMAGE_WIDTH,
           IMAGE_HEIGHT,
           false);
@@ -290,7 +290,7 @@ public class ComputerVisionActivity extends AppCompatActivity implements GLSurfa
     if (gpuDownloadFrameBufferIndex >= 0) {
       TextureReaderImage image = textureReader.acquireFrame(gpuDownloadFrameBufferIndex);
 
-      if (image.format != TextureReaderImage.IMAGE_FORMAT_I8) {
+      if (image.format != TextureReaderImage.IMAGE_FORMAT_RGBA) {
         throw new IllegalArgumentException(
             "Expected image in I8 format, got format " + image.format);
       }
