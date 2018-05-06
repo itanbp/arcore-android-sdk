@@ -307,10 +307,11 @@ public class ComputerVisionActivity extends AppCompatActivity implements GLSurfa
                     edgeDetector.detect(image.width, image.height, /* stride= */ image.width, image.buffer);
 
 
-
+            /*
             Bitmap bitmap = Bitmap.createBitmap(IMAGE_WIDTH, IMAGE_HEIGHT, Bitmap.Config.ARGB_8888);
             bitmap.copyPixelsFromBuffer(image.buffer.position(0));
             ImageUtils.saveBitmap(bitmap);
+            */
 
 
 
