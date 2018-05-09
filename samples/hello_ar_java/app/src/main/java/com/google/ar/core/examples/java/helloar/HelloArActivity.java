@@ -354,6 +354,7 @@ public class HelloArActivity extends AppCompatActivity implements GLSurfaceView.
                 taken from
                 https://stackoverflow.com/a/47358710/1869297
                  */
+                /*
                 float translation[] = new float[3];
                 float rotation[] = new float[4];
                 anchor.getPose().getTranslation(translation,0);
@@ -361,6 +362,8 @@ public class HelloArActivity extends AppCompatActivity implements GLSurfaceView.
 
                 Pose rotatedPose = new Pose(translation,rotation);
                 rotatedPose.toMatrix(anchorMatrix,0);
+                */
+                anchor.getPose().toMatrix(anchorMatrix, 0);
 
                 // Update and draw the model and its shadow.
                 virtualObject.updateModelMatrix(anchorMatrix, scaleFactor);
