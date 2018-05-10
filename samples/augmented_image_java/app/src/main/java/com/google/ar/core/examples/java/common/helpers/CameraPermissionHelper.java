@@ -26,7 +26,7 @@ import android.support.v4.content.ContextCompat;
 /** Helper to ask camera permission. */
 public final class CameraPermissionHelper {
   private static final String REQUIRED_PERMISSIONS[] = {
-          Manifest.permission.WRITE_EXTERNAL_STORAGE,
+          /*Manifest.permission.WRITE_EXTERNAL_STORAGE,*/
           Manifest.permission.CAMERA
   };
 
