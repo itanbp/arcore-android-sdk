@@ -352,4 +352,52 @@ public class CpuImageRenderer {
                     1.0f, 1.0f,
                     1.0f, 0.0f,
             };
+
+
+    /**
+     * Draws the AR background image. The image will be drawn such that virtual content rendered with
+     * the matrices provided by {@link Frame#getViewMatrix(float[], int)} and {@link
+     * Session#getProjectionMatrix(float[], int, float, float)} will accurately follow static physical
+     * objects. This must be called <b>before</b> drawing virtual content.
+     *
+     * @param frame The last {@code Frame} returned by {@link Session#update()}.
+     * @param imageWidth The processed image width.
+     * @param imageHeight The processed image height.
+     * @param processedImageBytesGrayscale the processed bytes of the image, grayscale par only. Can
+     *     be null.
+     * @param screenAspectRatio The aspect ratio of the screen.
+     * @param cameraToDisplayRotation The rotation of camera with respect to the display. The value is
+     *     one of android.view.Surface.ROTATION_#(0, 90, 180, 270).
+     */
+    public void drawWithCpuImage(
+            Frame frame,
+            int imageWidth,
+            int imageHeight,
+            ByteBuffer processedImageBytesGrayscale,
+            float screenAspectRatio,
+            int cameraToDisplayRotation) {
+
+        // Apply overlay image buffer
+        if (processedImageBytesGrayscale != null) {
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, overlayTextureId);
+            GLES20.glTexImage2D(
+                    GLES20.GL_TEXTURE_2D,
+                    0,
+                    GLES20.GL_LUMINANCE,
+                    imageWidth,
+                    imageHeight,
+                    0,
+                    GLES20.GL_LUMINANCE,
+                    GLES20.GL_UNSIGNED_BYTE,
+                    processedImageBytesGrayscale);
+        }
+
+        updateTextureCoordinates(
+                frame, imageWidth, imageHeight, screenAspectRatio, cameraToDisplayRotation);
+
+        // Rest of the draw code is shared between the two functions.
+        drawWithoutCpuImage();
+    }
+
 }

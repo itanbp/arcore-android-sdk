@@ -20,12 +20,10 @@ import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
-
 import de.javagl.obj.Obj;
 import de.javagl.obj.ObjData;
 import de.javagl.obj.ObjReader;
 import de.javagl.obj.ObjUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -34,9 +32,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-/**
- * Renders an object loaded from an OBJ file in OpenGL.
- */
+/** Renders an object loaded from an OBJ file in OpenGL. */
 public class ObjectRenderer {
     private static final String TAG = ObjectRenderer.class.getSimpleName();
 
@@ -46,13 +42,9 @@ public class ObjectRenderer {
      * @see #setBlendMode(BlendMode)
      */
     public enum BlendMode {
-        /**
-         * Multiplies the destination color by the source alpha.
-         */
+        /** Multiplies the destination color by the source alpha. */
         Shadow,
-        /**
-         * Normal alpha blending.
-         */
+        /** Normal alpha blending. */
         Grid
     }
 
@@ -61,9 +53,10 @@ public class ObjectRenderer {
     private static final String FRAGMENT_SHADER_NAME = "shaders/object.frag";
 
     private static final int COORDS_PER_VERTEX = 3;
+    private static final float[] DEFAULT_COLOR = new float[] {0f, 0f, 0f, 0f};
 
     // Note: the last component must be zero to avoid applying the translational part of the matrix.
-    private static final float[] LIGHT_DIRECTION = new float[]{0.250f, 0.866f, 0.433f, 0.0f};
+    private static final float[] LIGHT_DIRECTION = new float[] {0.250f, 0.866f, 0.433f, 0.0f};
     private final float[] viewLightDirection = new float[4];
 
     // Object vertex buffer variables.
@@ -98,6 +91,9 @@ public class ObjectRenderer {
     // Shader location: color correction property
     private int colorCorrectionParameterUniform;
 
+    // Shader location: object color property (to change the primary color of the object).
+    private int colorUniform;
+
     private BlendMode blendMode = null;
 
     // Temporary matrices allocated here to reduce number of allocations for each frame.
@@ -111,14 +107,13 @@ public class ObjectRenderer {
     private float specular = 1.0f;
     private float specularPower = 6.0f;
 
-    public ObjectRenderer() {
-    }
+    public ObjectRenderer() {}
 
     /**
      * Creates and initializes OpenGL resources needed for rendering the model.
      *
-     * @param context                 Context for loading the shader and below-named model and texture assets.
-     * @param objAssetName            Name of the OBJ file containing the model geometry.
+     * @param context Context for loading the shader and below-named model and texture assets.
+     * @param objAssetName Name of the OBJ file containing the model geometry.
      * @param diffuseTextureAssetName Name of the PNG file containing the diffuse texture map.
      */
     public void createOnGlThread(Context context, String objAssetName, String diffuseTextureAssetName)
@@ -149,6 +144,7 @@ public class ObjectRenderer {
         materialParametersUniform = GLES20.glGetUniformLocation(program, "u_MaterialParameters");
         colorCorrectionParameterUniform =
                 GLES20.glGetUniformLocation(program, "u_ColorCorrectionParameters");
+        colorUniform = GLES20.glGetUniformLocation(program, "u_ObjColor");
 
         ShaderUtil.checkGLError(TAG, "Program parameters");
 
@@ -251,28 +247,23 @@ public class ObjectRenderer {
      * @param scaleFactor A separate scaling factor to apply before the {@code modelMatrix}.
      * @see android.opengl.Matrix
      */
-    public void updateModelMatrix(float[] modelMatrix, float scaleFactor/*, float[] rotationMatrix*/) {
-
+    public void updateModelMatrix(float[] modelMatrix, float scaleFactor) {
         float[] scaleMatrix = new float[16];
         Matrix.setIdentityM(scaleMatrix, 0);
         scaleMatrix[0] = scaleFactor;
         scaleMatrix[5] = scaleFactor;
         scaleMatrix[10] = scaleFactor;
         Matrix.multiplyMM(this.modelMatrix, 0, modelMatrix, 0, scaleMatrix, 0);
-
-        // rotation
-        //Matrix.multiplyMM(this.modelMatrix, 0, this.modelMatrix, 0, rotationMatrix, 0);
-
     }
 
     /**
      * Sets the surface characteristics of the rendered model.
      *
-     * @param ambient       Intensity of non-directional surface illumination.
-     * @param diffuse       Diffuse (matte) surface reflectivity.
-     * @param specular      Specular (shiny) surface reflectivity.
+     * @param ambient Intensity of non-directional surface illumination.
+     * @param diffuse Diffuse (matte) surface reflectivity.
+     * @param specular Specular (shiny) surface reflectivity.
      * @param specularPower Surface shininess. Larger values result in a smaller, sharper specular
-     *                      highlight.
+     *     highlight.
      */
     public void setMaterialProperties(
             float ambient, float diffuse, float specular, float specularPower) {
@@ -285,16 +276,24 @@ public class ObjectRenderer {
     /**
      * Draws the model.
      *
-     * @param cameraView        A 4x4 view matrix, in column-major order.
+     * @param cameraView A 4x4 view matrix, in column-major order.
      * @param cameraPerspective A 4x4 projection matrix, in column-major order.
-     * @param lightIntensity    Illumination intensity. Combined with diffuse and specular material
-     *                          properties.
+     * @param lightIntensity Illumination intensity. Combined with diffuse and specular material
+     *     properties.
      * @see #setBlendMode(BlendMode)
      * @see #updateModelMatrix(float[], float)
      * @see #setMaterialProperties(float, float, float, float)
      * @see android.opengl.Matrix
      */
     public void draw(float[] cameraView, float[] cameraPerspective, float[] colorCorrectionRgba) {
+        draw(cameraView, cameraPerspective, colorCorrectionRgba, DEFAULT_COLOR);
+    }
+
+    public void draw(
+            float[] cameraView,
+            float[] cameraPerspective,
+            float[] colorCorrectionRgba,
+            float[] objColor) {
 
         ShaderUtil.checkGLError(TAG, "Before draw");
 
@@ -314,13 +313,10 @@ public class ObjectRenderer {
                 viewLightDirection[1],
                 viewLightDirection[2],
                 1.f);
+        GLES20.glUniform4fv(colorCorrectionParameterUniform, 1, colorCorrectionRgba, 0);
 
-        GLES20.glUniform4f(
-                colorCorrectionParameterUniform,
-                colorCorrectionRgba[0],
-                colorCorrectionRgba[1],
-                colorCorrectionRgba[2],
-                colorCorrectionRgba[3]);
+        // Set the object color property.
+        GLES20.glUniform4fv(colorUniform, 1, objColor, 0);
 
         // Set the object material properties.
         GLES20.glUniform4f(materialParametersUniform, ambient, diffuse, specular, specularPower);
